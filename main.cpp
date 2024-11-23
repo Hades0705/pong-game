@@ -1,10 +1,8 @@
 #include <raylib.h>
 #include <iostream>
 
-Color Green = Color{38, 185, 154, 255};
-Color Dark_Green = Color{20, 160, 133, 255};
-Color Light_Green = Color{129, 204, 184, 255};
-Color Yellow = Color{243, 213, 91, 255};
+Color Dark_BLue = Color{0, 255, 255, 255};
+Color Light_Blue = Color{0, 191, 255, 255};
 
 int player_score = 0;
 int cpu_score = 0;
@@ -16,7 +14,7 @@ class Ball {
     int radius;
 
     void Draw() {
-        DrawCircle(x, y, radius, Yellow);
+        DrawCircle(x, y, radius, ORANGE);
     }
 
     void Update() {
@@ -65,7 +63,10 @@ class Paddle {
     int speed;
 
     void Draw() {
-        DrawRectangleRounded(Rectangle{x, y, width, height}, 0.8, 0, WHITE);
+        DrawRectangleRounded(Rectangle{x, y, width, height}, 0.8, 0, RED);
+    }
+    void Draw1() {
+        DrawRectangleRounded(Rectangle{x, y, width, height}, 0.8, 0, BLACK);
     }
 
     void Update() {
@@ -139,12 +140,12 @@ int main() {
         }
 
         // Drawing
-        ClearBackground(Dark_Green);
-        DrawRectangle(screen_width / 2, 0, screen_width / 2, screen_height, Green);
-        DrawCircle(screen_width / 2, screen_height / 2, 150, Light_Green);
+        ClearBackground(Dark_BLue);
+        DrawRectangle(screen_width / 2, 0, screen_width / 2, screen_height, Light_Blue);
+        DrawCircle(screen_width / 2, screen_height / 2, 150, BLUE);
         DrawLine(screen_width / 2, 0, screen_width / 2, screen_height, WHITE);
         ball.Draw();
-        cpu.Draw();
+        cpu.Draw1();
         player.Draw();
         DrawText(TextFormat("%i", cpu_score), screen_width / 4 - 20, 20, 80, WHITE);
         DrawText(TextFormat("%i", player_score), 3 * screen_width / 4 - 20, 20, 80, WHITE);
