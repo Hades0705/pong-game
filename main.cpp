@@ -1,10 +1,14 @@
 #include <raylib.h>
 #include <iostream>
+#include <button.hpp>
+using namespace std;
 
+Color Green = Color{130, 185, 154, 255};
 Color Dark_BLue = Color{0, 255, 255, 255};
 Color Light_Blue = Color{0, 191, 255, 255};
+Color Yellow = Color{243, 213, 91, 255};
 
-int player_score = 0;
+int player1_score = 0;
 int cpu_score = 0;
 
 class Ball {
@@ -31,7 +35,7 @@ class Ball {
         }
 
         if (x - radius <= 0) {
-            player_score++;
+            player1_score++;
             ResetBall();
         }
     }
@@ -94,11 +98,55 @@ class CpuPaddle : public Paddle {
 };
 
 Ball ball;
-Paddle player;
+Paddle player1, player2;
 CpuPaddle cpu;
+Texture2D background = LoadTexture("Graphics/background.png");
+Button startButton{"Graphics/start_button.png", {540, 150}, 0.65};
+Button exitButton{"Graphics/exit_button.png", {540, 300}, 0.65};
+bool exit = false;
 
+void 1vs1(){
+    while (1){
+
+            BeginDrawing();
+            // Updating
+
+            ball.Update();
+            player1.Update();
+            cpu.Update(ball.y);
+
+            // Checking for collisions
+            if (CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, {player1.x, player1.y, player1.width, player1.height})) {
+                ball.speed_x *= -1;
+            }
+
+            if (CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, {cpu.x, cpu.y, cpu.width, cpu.height})) {
+                ball.speed_x *= -1;
+            }
+
+            // Drawing
+            ClearBackground(Dark_BLue);
+            DrawRectangle(screen_width / 2, 0, screen_width / 2, screen_height, Light_Blue);
+            DrawCircle(screen_width / 2, screen_height / 2, 150, BLUE);
+            DrawLine(screen_width / 2, 0, screen_width / 2, screen_height, WHITE);
+            ball.Draw();
+            cpu.Draw1();
+            player1.Draw();
+            DrawText(TextFormat("%i", cpu_score), screen_width / 4 - 20, 20, 80, WHITE);
+            DrawText(TextFormat("%i", player1_score), 3 * screen_width / 4 - 20, 20, 80, WHITE);
+            cout << "1" << endl;
+            EndDrawing(); 
+
+            if(WindowShouldClose() == true){
+                    CloseWindow();
+            }
+
+            }
+
+
+}
 int main() {
-    std::cout << "Starting the game" << std::endl;
+
     const int screen_width = 1280;
     const int screen_height = 800;
     InitWindow(screen_width, screen_height, "My Pong Game!");
@@ -109,11 +157,17 @@ int main() {
     ball.speed_x = 7;
     ball.speed_y = 7;
 
-    player.width = 25;
-    player.height = 120;
-    player.x = screen_width - player.width - 10;
-    player.y = screen_height / 2 - player.height / 2;
-    player.speed = 6;
+    player1.width = 25;
+    player1.height = 120;
+    player1.x = screen_width - player1.width - 10;
+    player1.y = screen_height / 2 - player1.height / 2;
+    player1.speed = 6;
+
+    player2.height = 120;
+    player2.width = 25;
+    player2.x = 10;
+    player2.y = screen_height / 2 - player2.height / 2;
+    player2.speed = 6;
 
     cpu.height = 120;
     cpu.width = 25;
@@ -121,38 +175,30 @@ int main() {
     cpu.y = screen_height / 2 - cpu.height / 2;
     cpu.speed = 6;
 
-    while (WindowShouldClose() == false) {
+
+    while (WindowShouldClose() == false && exit == false) {
+
+        Vector2 mousePosition = GetMousePosition();
+        bool mousePressed = IsMouseButtonPressed(MOUSE_BUTTON_LEFT);
         BeginDrawing();
 
-        // Updating
-
-        ball.Update();
-        player.Update();
-        cpu.Update(ball.y);
-
-        // Checking for collisions
-        if (CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, {player.x, player.y, player.width, player.height})) {
-            ball.speed_x *= -1;
+        if(startButton.isPressed(mousePosition, mousePressed)){
+            
+            1vs1();
         }
 
-        if (CheckCollisionCircleRec({ball.x, ball.y}, ball.radius, {cpu.x, cpu.y, cpu.width, cpu.height})) {
-            ball.speed_x *= -1;
+        if(exitButton.isPressed(mousePosition, mousePressed))
+        {
+            exit = true;
         }
-
-        // Drawing
-        ClearBackground(Dark_BLue);
-        DrawRectangle(screen_width / 2, 0, screen_width / 2, screen_height, Light_Blue);
-        DrawCircle(screen_width / 2, screen_height / 2, 150, BLUE);
-        DrawLine(screen_width / 2, 0, screen_width / 2, screen_height, WHITE);
-        ball.Draw();
-        cpu.Draw1();
-        player.Draw();
-        DrawText(TextFormat("%i", cpu_score), screen_width / 4 - 20, 20, 80, WHITE);
-        DrawText(TextFormat("%i", player_score), 3 * screen_width / 4 - 20, 20, 80, WHITE);
-
+        ClearBackground(BLACK);
+        DrawTexture(background, 0, 0, WHITE);
+        startButton.Draw();
+        exitButton.Draw();
         EndDrawing();
     }
 
     CloseWindow();
     return 0;
 }
+
